@@ -2,14 +2,17 @@ package com.intent.BookStore.controller;
 
 import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.facade.BookFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,8 +21,12 @@ public class BookController {
     private final BookFacade bookFacade;
 
     @GetMapping("/books")
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
-        List<BookDTO> books = bookFacade.getAllBooks();
+    public ResponseEntity<Page<BookDTO>> getAllBooks(
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "page should be greater or equals one")
+            int pageNum,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "page size should be greater or equals one")
+            int pageSize) {
+        Page<BookDTO> books = bookFacade.getAllBooks(pageNum, pageSize);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -54,13 +61,17 @@ public class BookController {
     }
 
     @GetMapping("/books/search")
-    public ResponseEntity<List<BookDTO>> getAllBooksByCriteria(
+    public ResponseEntity<Page<BookDTO>> getAllBooksByCriteria(
             @RequestParam(required = false, defaultValue = "") String authorName,
             @RequestParam(required = false, defaultValue = "") String genre,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false, defaultValue = "0") int quantity) {
-        List<BookDTO> books = bookFacade.getAllBooksByCriteria(authorName, genre, minPrice, maxPrice, quantity);
+            @RequestParam(required = false, defaultValue = "0") int quantity,
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "page should be greater or equals one") int pageNum,
+            @RequestParam(defaultValue = "1")
+            @Min(value = 1, message = "page size should be greater or equals one") int pageSize) {
+        Page<BookDTO> books = bookFacade.getAllBooksByCriteria(authorName, genre, minPrice, maxPrice, quantity, pageNum, pageSize);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }

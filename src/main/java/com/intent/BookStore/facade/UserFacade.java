@@ -1,12 +1,13 @@
 package com.intent.BookStore.facade;
 
+import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.UserDTO;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 public interface UserFacade {
 
-    List<UserDTO> getAllUsers();
+    Page<UserDTO> getAllUsers(int pageNum, int pageSize);
 
     UserDTO getUserById(Long id);
 
@@ -16,5 +17,7 @@ public interface UserFacade {
     UserDTO createUser(UserDTO userDTO);
 
     UserDTO updateUser(Long id, UserDTO updatedUserDTO);
+
+    UserDTO updateUserPassword(Long id, ChangePasswordDTO changePasswordDTO);
 
 }

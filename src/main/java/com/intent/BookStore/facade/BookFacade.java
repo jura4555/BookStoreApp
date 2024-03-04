@@ -1,13 +1,13 @@
 package com.intent.BookStore.facade;
 
 import com.intent.BookStore.dto.BookDTO;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 
 public interface BookFacade {
-    List<BookDTO> getAllBooks();
+    Page<BookDTO> getAllBooks(int pageNum, int pageSize);
 
     BookDTO getBookById(Long id);
 
@@ -19,6 +19,6 @@ public interface BookFacade {
 
     void deleteBook(Long id);
 
-    List<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity);
+    Page<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize);
 
 }

@@ -5,6 +5,10 @@ import com.intent.BookStore.model.Book;
 import com.intent.BookStore.repository.BookRepository;
 import com.intent.BookStore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,8 +20,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import static com.intent.BookStore.util.ExceptionMessageUtil.BOOK_NOT_FOUND_BY_ID_ERROR_MESSAGE;
-import static com.intent.BookStore.util.ExceptionMessageUtil.BOOK_NOT_FOUND_BY_TITLE_ERROR_MESSAGE;
+import static com.intent.BookStore.util.ExceptionMessageUtil.*;
 
 
 @Service
@@ -27,8 +30,10 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public Page<Book> getAllBooks(int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
+                Sort.by("id"));
+        return bookRepository.findAll(pageable);
     }
 
     @Override
@@ -62,7 +67,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity) {
+    public Page<Book> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
+                Sort.by("id"));
         return bookRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(buildAuthorNamePredicate(root, criteriaBuilder, authorName));
@@ -71,7 +78,7 @@ public class BookServiceImpl implements BookService {
             predicates.add(buildQuantityPredicate(root, criteriaBuilder, quantity));
             predicates.removeIf(Objects::isNull);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        });
+        }, pageable);
     }
 
     private Predicate buildAuthorNamePredicate(Root<Book> root, CriteriaBuilder criteriaBuilder, String authorName) {
@@ -106,7 +113,7 @@ public class BookServiceImpl implements BookService {
 
     private void checkIfBookNotExist(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new BookNotFoundException(String.format("Book with id: %s is not found", id));
+            throw new BookNotFoundException(String.format(BOOK_NOT_FOUND_BY_ID_ERROR_MESSAGE, id));
         }
     }
 }

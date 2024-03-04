@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class BookMapperUtil {
-    //todo: вирішити що робити з OrderItem
     public static BookDTO toBookDto(Book book) {
         return new BookDTO()
                 .setId(book.getId())

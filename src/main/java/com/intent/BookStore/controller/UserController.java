@@ -1,10 +1,14 @@
 package com.intent.BookStore.controller;
 
-import com.intent.BookStore.dto.BookDTO;
+import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.UserDTO;
 import com.intent.BookStore.dto.validation.group.OnCreate;
+import com.intent.BookStore.dto.validation.group.OnUpdate;
 import com.intent.BookStore.facade.UserFacade;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,8 +23,12 @@ public class UserController {
     private final UserFacade userFacade;
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userFacade.getAllUsers();
+    public ResponseEntity<Page<UserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "page should be greater or equals one")
+            int pageNum,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "page should be greater or equals one")
+            int pageSize) {
+        Page<UserDTO> users = userFacade.getAllUsers(pageNum, pageSize);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -30,6 +38,11 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO user = userFacade.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
     @PostMapping("/users")
     public ResponseEntity<UserDTO> createUser(@Validated(OnCreate.class) @RequestBody UserDTO userDTO) {
@@ -37,8 +50,16 @@ public class UserController {
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
+    @PutMapping("/users/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody UserDTO updatedUserDTO) {
+        UserDTO updatedUser = userFacade.updateUser(id, updatedUserDTO);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 
-
-
+    @PatchMapping("/users/{id}")
+    public ResponseEntity<UserDTO> updateUserPassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
+        UserDTO userDTO = userFacade.updateUserPassword(id, changePasswordDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
 
 }

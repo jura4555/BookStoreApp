@@ -6,6 +6,8 @@ import com.intent.BookStore.mapper.BookMapperUtil;
 import com.intent.BookStore.model.Book;
 import com.intent.BookStore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,9 +23,9 @@ public class BookFacadeImpl implements BookFacade {
 
     private final BookService bookService;
     @Override
-    public List<BookDTO> getAllBooks() {
-        return bookService.getAllBooks().stream()
-                .map(BookMapperUtil::toBookDto).collect(Collectors.toList());
+    public Page<BookDTO> getAllBooks(int pageNum, int pageSize) {
+        Page<Book> bookPage = bookService.getAllBooks(pageNum, pageSize);
+        return bookPage.map(BookMapperUtil::toBookDto);
     }
 
     @Override
@@ -56,9 +58,9 @@ public class BookFacadeImpl implements BookFacade {
     }
 
     @Override
-    public List<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity) {
-        return bookService.getAllBooksByCriteria(authorName, genre, minPrice, maxPrice, quantity).stream()
-                .map(BookMapperUtil::toBookDto).collect(Collectors.toList());
+    public Page<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize) {
+        Page<Book> bookPage = bookService.getAllBooksByCriteria(authorName, genre, minPrice, maxPrice, quantity, pageNum, pageSize);
+        return bookPage.map(BookMapperUtil::toBookDto);
     }
 
 }

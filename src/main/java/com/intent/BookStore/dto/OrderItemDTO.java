@@ -2,7 +2,6 @@ package com.intent.BookStore.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -10,11 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,12 +18,16 @@ import java.util.Set;
 @Getter
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderDTO {
+public class OrderItemDTO {
     private Long id;
 
-    @NotNull(message = "userId is required")
-    @Positive(message = "userId must be positive or zero")
-    private Long userId;
+    @NotNull(message = "orderId is required")
+    @Positive(message = "orderId must be positive or zero")
+    private Long orderId;
+
+    @NotNull(message = "bookId is required")
+    @Positive(message = "bookId must be positive or zero")
+    private Long bookId;
 
     @NotNull(message = "Quantity is required")
     @PositiveOrZero(message = "Quantity must be positive or zero")
@@ -36,11 +36,4 @@ public class OrderDTO {
     @NotNull(message = "Quantity is required")
     @PositiveOrZero(message = "Quantity must be positive or zero")
     private BigDecimal totalPrice;
-
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "The date must be in the format yyyy-MM-dd")
-    @NotNull(message = "Completed date is required")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate completedAt;
-
-    private Set<OrderItemDTO> orderItemDTOs;
 }

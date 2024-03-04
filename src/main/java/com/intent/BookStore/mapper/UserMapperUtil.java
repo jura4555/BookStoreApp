@@ -27,7 +27,6 @@ public class UserMapperUtil {
         }
         userDTO.setOrders(orderDTOs);
         return userDTO;
-        // todo: подумати чи добавляти order
     }
 
     public static User toUser(UserDTO userDTO) {
@@ -37,6 +36,5 @@ public class UserMapperUtil {
                 .setPassword(userDTO.getPassword())
                 .setEmail(userDTO.getEmail())
                 .setPhoneNumber(userDTO.getPhoneNumber());
-        // todo: подумати чи добавляти order
     }
 }

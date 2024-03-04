@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "Orders")
@@ -13,7 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Accessors(chain = true)
 public class Order {
     @Id
@@ -29,13 +29,18 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price")
     private BigDecimal totalPrice;
 
-    @Column(name = "completed_at", nullable = false)
+    @Column(name = "completed_at")
     private LocalDate completedAt;
 
+    @Column(nullable = false)
+    private boolean closed;
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<OrderItem> orderItems;
 }
