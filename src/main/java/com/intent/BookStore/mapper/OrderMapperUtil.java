@@ -18,7 +18,8 @@ public class OrderMapperUtil {
                 .setUserId(order.getUser().getId())
                 .setQuantity(order.getQuantity())
                 .setTotalPrice(order.getTotalPrice())
-                .setCompletedAt(order.getCompletedAt());
+                .setCompletedAt(order.getCompletedAt())
+                .setClosed(order.isClosed());
         Set<OrderItemDTO> orderItemDTOs = new HashSet<>();
         if (order.getOrderItems() != null) {
             orderItemDTOs = order.getOrderItems().stream()
@@ -35,6 +36,7 @@ public class OrderMapperUtil {
                 .setUser(user)
                 .setQuantity(orderDTO.getQuantity())
                 .setTotalPrice(orderDTO.getTotalPrice())
-                .setCompletedAt(orderDTO.getCompletedAt());
+                .setCompletedAt(orderDTO.getCompletedAt())
+                .setClosed(orderDTO.isClosed());
     }
 }

@@ -14,7 +14,6 @@ import com.intent.BookStore.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.intent.BookStore.mapper.OrderItemMapperUtil.toOrderItemDTO;
 import static com.intent.BookStore.mapper.OrderMapperUtil.toOrderDTO;
 
 @Component
@@ -22,32 +21,43 @@ import static com.intent.BookStore.mapper.OrderMapperUtil.toOrderDTO;
 public class OrderFacadeImpl implements OrderFacade {
 
     private final OrderService orderService;
-    //private final UserService userService;
+    private final UserService userService;
     private final BookService bookService;
     @Override
-    public OrderDTO createOrderItem(OrderItemDTO orderItemDTO) {
-        //todo: в orderItemDTO міститься bookId і userID
-        // todo: в order міститься userId
-        //todo: можна спочатку створити order пустий а потім вже його наповнювати - без цього буде погано!!!
+    public OrderDTO createOrderItem(OrderItemDTO orderItemDTO, long userId) {
         Book book = bookService.getBookById(orderItemDTO.getBookId());
-        Order order = orderService.getOrderById(orderItemDTO.getOrderId());
-        // todo: проговорити що робити коли order ще не стоврений і як це зробити
-        // todo: запропонувати спочатку або створити його або тут перевіряти чи такий order істнує і якщо ні то
-        // todo: ту використати метод createInitialOrder і
-
+        Order order = null;
+        if(orderItemDTO.getOrderId() == null && userId > 0) {
+            User user = userService.getUserById(userId);
+            order = orderService.createOrder(user);
+        } else {
+            order = orderService.getOrderById(orderItemDTO.getOrderId());
+        }
         OrderItem orderItem = OrderItemMapperUtil.toOrderItem(orderItemDTO, order, book);
         Order createdOrder = orderService.createOrderItem(orderItem);
 
         return toOrderDTO(createdOrder);
-        //return null;
     }
 
     @Override
     public OrderDTO getOrderById(Long id) {
         Order order = orderService.getOrderById(id);
-        System.out.println(order.getUser().getEmail());
-        System.out.println(order.getUser());
         return toOrderDTO(order);
+    }
+
+    @Override
+    public void deleteOrderItem(Long id) {
+        orderService.deleteOrderItem(id);
+    }
+
+    @Override
+    public void deleteOrder(Long id) {
+        orderService.deleteOrder(id);
+    }
+
+    @Override
+    public OrderDTO closeOrder(Long id) {
+        return toOrderDTO(orderService.closeOrder(id));
     }
 
 

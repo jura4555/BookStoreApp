@@ -2,6 +2,7 @@ package com.intent.BookStore.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,6 @@ import java.math.BigDecimal;
 public class OrderItemDTO {
     private Long id;
 
-    @NotNull(message = "orderId is required")
-    @Positive(message = "orderId must be positive or zero")
     private Long orderId;
 
     @NotNull(message = "bookId is required")
@@ -33,7 +32,6 @@ public class OrderItemDTO {
     @PositiveOrZero(message = "Quantity must be positive or zero")
     private int quantity;
 
-    @NotNull(message = "Quantity is required")
-    @PositiveOrZero(message = "Quantity must be positive or zero")
+    @Null(message = "Total price must be null")
     private BigDecimal totalPrice;
 }

@@ -7,25 +7,26 @@ import com.intent.BookStore.exception.UserNotFoundException;
 import com.intent.BookStore.model.User;
 import com.intent.BookStore.repository.UserRepository;
 import com.intent.BookStore.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import static com.intent.BookStore.util.ExceptionMessageUtil.*;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public Page<User> getAllUsers(int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
                 Sort.by("id"));
@@ -44,11 +45,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User createUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
+    @Transactional
     public User updateUser(Long id, User updatedUser) {
         User existUser = getUserById(id);
         updatedUser.setId(id);
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User changeUserPassword(Long id, ChangePasswordDTO changePasswordDTO) {
         User existUser = getUserById(id);
         String newPassword = changePasswordDTO.getNewPassword();

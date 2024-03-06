@@ -29,18 +29,16 @@ public class OrderDTO {
     @Positive(message = "userId must be positive or zero")
     private Long userId;
 
-    @NotNull(message = "Quantity is required")
-    @PositiveOrZero(message = "Quantity must be positive or zero")
     private int quantity;
 
-    @NotNull(message = "Quantity is required")
-    @PositiveOrZero(message = "Quantity must be positive or zero")
     private BigDecimal totalPrice;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "The date must be in the format yyyy-MM-dd")
     @NotNull(message = "Completed date is required")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate completedAt;
+
+    private boolean closed;
 
     private Set<OrderItemDTO> orderItemDTOs;
 }

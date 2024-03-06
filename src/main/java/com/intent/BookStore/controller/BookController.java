@@ -2,8 +2,6 @@ package com.intent.BookStore.controller;
 
 import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.facade.BookFacade;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

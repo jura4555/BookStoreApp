@@ -4,6 +4,7 @@ import com.intent.BookStore.exception.BookNotFoundException;
 import com.intent.BookStore.model.Book;
 import com.intent.BookStore.repository.BookRepository;
 import com.intent.BookStore.service.BookService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
+    @Transactional
     public Page<Book> getAllBooks(int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
                 Sort.by("id"));
@@ -49,11 +51,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public Book createBook(Book book) {
         return bookRepository.save(book);
     }
 
     @Override
+    @Transactional
     public Book updateBook(Long id, Book updatedBook) {
         checkIfBookNotExist(id);
         updatedBook.setId(id);
@@ -61,12 +65,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteBook(Long id) {
         checkIfBookNotExist(id);
         bookRepository.deleteById(id);
     }
 
     @Override
+    @Transactional
     public Page<Book> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize,
                 Sort.by("id"));
