@@ -4,6 +4,7 @@ import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.model.User;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserService {
@@ -18,5 +19,7 @@ public interface UserService {
     User updateUser(Long id, User updatedUser);
 
     User changeUserPassword(Long id, ChangePasswordDTO changePasswordDTO);
+    
+    User increaseAccountBalance(Long id, BigDecimal amount);
 
 }

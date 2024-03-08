@@ -15,7 +15,8 @@ public class BookMapperUtil {
                 .setGenre(book.getGenre())
                 .setPrice(book.getPrice())
                 .setQuantity(book.getQuantity())
-                .setDescription(book.getDescription());
+                .setDescription(book.getDescription())
+                .setImageURL(book.getImageURL());
     }
 
     public static Book toBook(BookDTO bookDto) {
@@ -26,7 +27,7 @@ public class BookMapperUtil {
                 .setGenre(bookDto.getGenre())
                 .setPrice(bookDto.getPrice())
                 .setQuantity(bookDto.getQuantity())
-                .setDescription(bookDto.getDescription());
+                .setDescription(bookDto.getDescription())
+                .setImageURL(bookDto.getImageURL());
     }
-
 }

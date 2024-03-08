@@ -13,6 +13,9 @@ public class ExceptionMessageUtil {
 
     public static final String ORDER_CLOSED_ERROR_MESSAGE = "Cannot perform operation because order with id: %d is closed";
 
+    public static final String INSUFFICIENT_FUNDS_ERROR_MESSAGE = "There is not enough money in the account to complete the purchase";
+
+
 
 
 }

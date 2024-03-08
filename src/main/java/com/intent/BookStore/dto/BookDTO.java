@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.URL;
 
 import java.math.BigDecimal;
 
@@ -39,4 +40,7 @@ public class BookDTO {
     @NotBlank(message = "Description is required")
     @DescriptionWordCount(value = 6)
     private String description;
+
+    @URL(message = "Image URL must be a valid URL")
+    private String imageURL;
 }

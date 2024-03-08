@@ -1,9 +1,6 @@
 package com.intent.BookStore.service.impl;
 
-import com.intent.BookStore.exception.ClosedOrderException;
-import com.intent.BookStore.exception.InsufficientStockException;
-import com.intent.BookStore.exception.OrderItemNotFoundException;
-import com.intent.BookStore.exception.OrderNotFoundException;
+import com.intent.BookStore.exception.*;
 import com.intent.BookStore.model.Book;
 import com.intent.BookStore.model.Order;
 import com.intent.BookStore.model.OrderItem;
@@ -92,12 +89,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order closeOrder(Long id) {
         Order order = getOrderById(id);
+        User user = order.getUser();
         checkOrderStatus(order);
+        checkUserBalance(order, user);
+        updateUserBalance(order, user);
         markOrderAsClosed(order);
         return orderRepository.save(order);
     }
-
-
 
 
     private void deleteOrderItems(Set<OrderItem> orderItems) {
@@ -213,6 +211,16 @@ public class OrderServiceImpl implements OrderService {
 
     private void deleteOrder(Order order) {
         orderRepository.delete(order);
+    }
+
+    private void updateUserBalance(Order order, User user) {
+        user.setAccountBalance(user.getAccountBalance().subtract(order.getTotalPrice()));
+    }
+
+    private void checkUserBalance(Order order, User user) {
+        if(user.getAccountBalance().compareTo(order.getTotalPrice()) < 0) {
+            throw new InsufficientFundsException(INSUFFICIENT_FUNDS_ERROR_MESSAGE);
+        }
     }
 
     private void markOrderAsClosed(Order order) {

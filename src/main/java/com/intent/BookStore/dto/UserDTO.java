@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -34,6 +35,9 @@ public class UserDTO {
 
     @Pattern(regexp = "\\+380\\d{9}", message = "Phone number must be in the format +380XXXXXXXXX")
     private String phoneNumber;
+
+    @Null(message = "Account balance must be null")
+    private BigDecimal accountBalance;
 
     private Set<OrderDTO> orders;
 }

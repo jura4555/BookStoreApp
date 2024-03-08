@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,5 +57,10 @@ public class UserFacadeImpl implements UserFacade {
     public UserDTO updateUserPassword(Long id, ChangePasswordDTO changePasswordDTO) {
         User undatedUser = userService.changeUserPassword(id, changePasswordDTO);
         return toUserDTO(undatedUser);
+    }
+
+    @Override
+    public UserDTO increaseAccountBalance(Long id, BigDecimal amount) {
+        return toUserDTO(userService.increaseAccountBalance(id, amount));
     }
 }
