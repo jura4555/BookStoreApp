@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID_ERROR_MESSAGE, id)));
     }
 
+    @Override
     public User getUserByUsername(String username){
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_USERNAME_ERROR_MESSAGE, username)));
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User increaseAccountBalance(Long id, BigDecimal amount) {
         User existUser = getUserById(id);
         existUser.setAccountBalance(existUser.getAccountBalance().add(amount));

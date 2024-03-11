@@ -5,7 +5,6 @@ import com.intent.BookStore.model.Book;
 import com.intent.BookStore.model.Order;
 import com.intent.BookStore.model.OrderItem;
 import com.intent.BookStore.model.User;
-import com.intent.BookStore.repository.BookRepository;
 import com.intent.BookStore.repository.OrderItemRepository;
 import com.intent.BookStore.repository.OrderRepository;
 import com.intent.BookStore.repository.UserRepository;
@@ -29,8 +28,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final UserRepository userRepository;
 
-    private final BookRepository bookRepository;
-
     @Override
     public Order createOrderItem(OrderItem orderItem) {
         Order order = orderItem.getOrder();
@@ -41,8 +38,7 @@ public class OrderServiceImpl implements OrderService {
         updateItemTotal(orderItem, book);
         updateOrderTotal(orderItem, order);
         updateOrderItems(orderItem, order);
-        orderRepository.save(order);
-        return order;
+        return orderRepository.save(order);
     }
 
     @Override
@@ -74,6 +70,7 @@ public class OrderServiceImpl implements OrderService {
         deleteOrSaveOrder(order);
         deleteOrderItem(orderItem);
     }
+
     @Override
     @Transactional
     public void deleteOrder(Long id) {
@@ -159,7 +156,7 @@ public class OrderServiceImpl implements OrderService {
 
     private boolean updateExistingOrderItem(OrderItem orderItem, Set<OrderItem> orderItems, boolean changed) {
         for (OrderItem existingOrderItem : orderItems) {
-            if (existingOrderItem.getBook().equals(orderItem.getBook())) {
+            if (existingOrderItem.getBook().getTitle().equals(orderItem.getBook().getTitle())) {
                 existingOrderItem.setQuantity(existingOrderItem.getQuantity() + orderItem.getQuantity());
                 existingOrderItem.setTotalPrice(existingOrderItem.getTotalPrice().add(orderItem.getTotalPrice()));
                 changed = true;
@@ -180,7 +177,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void removeFromOrder(Order order, OrderItem orderItem) {
         Set<OrderItem> orderItems = order.getOrderItems();
-        orderItems.remove(orderItem);
+        orderItems.removeIf(o -> o.getId().equals(orderItem.getId()));
         order.setOrderItems(orderItems);
     }
 

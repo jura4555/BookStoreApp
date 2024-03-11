@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @Accessors(chain = true)
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookDTO {
     private Long id;

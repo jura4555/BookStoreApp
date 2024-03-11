@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.intent.BookStore.dto.validation.group.OnCreate;
 import com.intent.BookStore.dto.validation.group.OnUpdate;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
@@ -40,4 +37,29 @@ public class UserDTO {
     private BigDecimal accountBalance;
 
     private Set<OrderDTO> orders;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserDTO userDTO = (UserDTO) o;
+
+        if (!username.equals(userDTO.username)) return false;
+        if (!password.equals(userDTO.password)) return false;
+        if (!email.equals(userDTO.email)) return false;
+        if (!phoneNumber.equals(userDTO.phoneNumber)) return false;
+        return accountBalance.equals(userDTO.accountBalance);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + username.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + email.hashCode();
+        result = 31 * result + phoneNumber.hashCode();
+        result = 31 * result + accountBalance.hashCode();
+        return result;
+    }
 }
