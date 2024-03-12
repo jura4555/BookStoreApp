@@ -48,8 +48,8 @@ public class BookFacadeImpl implements BookFacade {
 
     @Override
     public BookDTO updateBook(Long id, BookDTO updatedBootDTO) {
-        Book undatedBook = bookService.updateBook(id, toBook(updatedBootDTO));
-        return toBookDto(undatedBook);
+        Book updatedBook = bookService.updateBook(id, toBook(updatedBootDTO));
+        return toBookDto(updatedBook);
     }
 
     @Override

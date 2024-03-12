@@ -5,10 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -41,4 +38,30 @@ public class OrderDTO {
     private boolean closed;
 
     private Set<OrderItemDTO> orderItemDTOs;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrderDTO orderDTO = (OrderDTO) o;
+
+        if (quantity != orderDTO.quantity) return false;
+        if (closed != orderDTO.closed) return false;
+        if (!id.equals(orderDTO.id)) return false;
+        if (!userId.equals(orderDTO.userId)) return false;
+        if (!totalPrice.equals(orderDTO.totalPrice)) return false;
+        return completedAt != null ? completedAt.equals(orderDTO.completedAt) : orderDTO.completedAt == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + userId.hashCode();
+        result = 31 * result + quantity;
+        result = 31 * result + totalPrice.hashCode();
+        result = 31 * result + (completedAt != null ? completedAt.hashCode() : 0);
+        result = 31 * result + (closed ? 1 : 0);
+        return result;
+    }
 }

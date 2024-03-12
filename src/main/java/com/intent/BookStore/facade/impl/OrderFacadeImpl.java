@@ -11,6 +11,7 @@ import com.intent.BookStore.model.User;
 import com.intent.BookStore.service.BookService;
 import com.intent.BookStore.service.OrderService;
 import com.intent.BookStore.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ public class OrderFacadeImpl implements OrderFacade {
     private final UserService userService;
     private final BookService bookService;
     @Override
+    @Transactional
     public OrderDTO createOrderItem(OrderItemDTO orderItemDTO, long userId) {
         Book book = bookService.getBookById(orderItemDTO.getBookId());
         Order order = null;
@@ -59,6 +61,5 @@ public class OrderFacadeImpl implements OrderFacade {
     public OrderDTO closeOrder(Long id) {
         return toOrderDTO(orderService.closeOrder(id));
     }
-
 
 }

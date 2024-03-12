@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,6 +59,12 @@ public class UserController {
     @PatchMapping("/users/{id}")
     public ResponseEntity<UserDTO> updateUserPassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         UserDTO userDTO = userFacade.updateUserPassword(id, changePasswordDTO);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @PatchMapping("/users/{id}/increase-balance")
+    public ResponseEntity<UserDTO> increaseAccountBalance(@PathVariable Long id, @RequestParam BigDecimal amount) {
+        UserDTO userDTO = userFacade.increaseAccountBalance(id, amount);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 

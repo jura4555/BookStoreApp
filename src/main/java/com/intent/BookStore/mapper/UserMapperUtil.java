@@ -17,7 +17,8 @@ public class UserMapperUtil {
                 .setUsername(user.getUsername())
                 .setPassword(user.getPassword())
                 .setEmail(user.getEmail())
-                .setPhoneNumber(user.getPhoneNumber());
+                .setPhoneNumber(user.getPhoneNumber())
+                .setAccountBalance(user.getAccountBalance());
 
         Set<OrderDTO> orderDTOs = new HashSet<>();
         if (user.getOrders() != null) {
@@ -35,6 +36,7 @@ public class UserMapperUtil {
                 .setUsername(userDTO.getUsername())
                 .setPassword(userDTO.getPassword())
                 .setEmail(userDTO.getEmail())
-                .setPhoneNumber(userDTO.getPhoneNumber());
+                .setPhoneNumber(userDTO.getPhoneNumber())
+                .setAccountBalance(userDTO.getAccountBalance());
     }
 }

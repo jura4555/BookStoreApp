@@ -8,13 +8,14 @@ import com.intent.BookStore.model.User;
 import com.intent.BookStore.repository.UserRepository;
 import com.intent.BookStore.service.UserService;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 import static com.intent.BookStore.util.ExceptionMessageUtil.*;
 
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID_ERROR_MESSAGE, id)));
     }
 
+    @Override
     public User getUserByUsername(String username){
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_USERNAME_ERROR_MESSAGE, username)));
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User createUser(User user) {
+        user.setAccountBalance(BigDecimal.ZERO);
         return userRepository.save(user);
     }
 
@@ -67,6 +70,14 @@ public class UserServiceImpl implements UserService {
         checkExistPassword(changePasswordDTO.getCurrentPassword(), existUser.getPassword());
         checkConfirmPassword(newPassword, changePasswordDTO.getConfirmPassword());
         existUser.setPassword(newPassword);
+        return userRepository.save(existUser);
+    }
+
+    @Override
+    @Transactional
+    public User increaseAccountBalance(Long id, BigDecimal amount) {
+        User existUser = getUserById(id);
+        existUser.setAccountBalance(existUser.getAccountBalance().add(amount));
         return userRepository.save(existUser);
     }
 
