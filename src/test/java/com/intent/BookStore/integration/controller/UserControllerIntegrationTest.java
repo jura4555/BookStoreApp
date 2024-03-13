@@ -1,14 +1,15 @@
 package com.intent.BookStore.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intent.BookStore.aspect.ControllerAspect;
+import com.intent.BookStore.aws.DynamoClient;
+import com.intent.BookStore.config.DynamoDBConfig;
 import com.intent.BookStore.controller.UserController;
-import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.UserDTO;
 import com.intent.BookStore.facade.impl.UserFacadeImpl;
 import com.intent.BookStore.integration.AbstractTestContainer;
 import com.intent.BookStore.repository.UserRepository;
-import com.intent.BookStore.unit.util.TestBookDataUtil;
 import com.intent.BookStore.unit.util.TestUserDataUtil;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterAll;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -32,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@MockBeans({ @MockBean(ControllerAspect.class), @MockBean(DynamoClient.class), @MockBean(DynamoDBConfig.class) })
 class UserControllerIntegrationTest extends AbstractTestContainer {
 
     @Autowired
