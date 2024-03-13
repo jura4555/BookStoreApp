@@ -46,20 +46,18 @@ public class UserDTO {
         UserDTO userDTO = (UserDTO) o;
 
         if (!username.equals(userDTO.username)) return false;
-        if (!password.equals(userDTO.password)) return false;
         if (!email.equals(userDTO.email)) return false;
-        if (!phoneNumber.equals(userDTO.phoneNumber)) return false;
-        return accountBalance.equals(userDTO.accountBalance);
+        return phoneNumber.equals(userDTO.phoneNumber);
     }
 
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + username.hashCode();
-        result = 31 * result + password.hashCode();
+        result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + email.hashCode();
         result = 31 * result + phoneNumber.hashCode();
-        result = 31 * result + accountBalance.hashCode();
+        result = 31 * result + (accountBalance != null ? accountBalance.hashCode() : 0);
         return result;
     }
 }

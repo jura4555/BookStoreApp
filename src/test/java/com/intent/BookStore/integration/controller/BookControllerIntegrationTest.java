@@ -1,18 +1,20 @@
 package com.intent.BookStore.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intent.BookStore.aspect.ControllerAspect;
+import com.intent.BookStore.aws.DynamoClient;
+import com.intent.BookStore.config.DynamoDBConfig;
 import com.intent.BookStore.controller.BookController;
 import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.facade.impl.BookFacadeImpl;
 import com.intent.BookStore.integration.AbstractTestContainer;
-import com.intent.BookStore.model.Book;
 import com.intent.BookStore.repository.BookRepository;
 import com.intent.BookStore.unit.util.TestBookDataUtil;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@MockBeans({ @MockBean(ControllerAspect.class), @MockBean(DynamoClient.class), @MockBean(DynamoDBConfig.class) })
 class BookControllerIntegrationTest extends AbstractTestContainer {
 
     @Autowired
@@ -38,6 +41,8 @@ class BookControllerIntegrationTest extends AbstractTestContainer {
     private BookRepository bookRepository;
 
     private MockMvc mockMvc;
+
+
 
     @BeforeAll
     public static void setup() {
