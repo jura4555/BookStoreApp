@@ -22,7 +22,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 aws:
-  id: AKIATCKAOO7ISTZ3DKVD
-  key: eSN/6yEzl49LjD+46uApOhuSg9EvSCMGc5l0/zKV
+  id: ${aws_access_key_id}
+  key: ${aws_secret_access_key}
   region: eu-central-1
 
