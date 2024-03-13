@@ -21,7 +21,8 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-#  sql:
-#    init:
-#      mode: always
+aws:
+  id: AKIATCKAOO7ISTZ3DKVD
+  key: eSN/6yEzl49LjD+46uApOhuSg9EvSCMGc5l0/zKV
+  region: eu-central-1
 
