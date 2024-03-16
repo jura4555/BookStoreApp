@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserFacade userFacade;
