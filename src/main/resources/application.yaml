@@ -21,8 +21,4 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-aws:
-  id: ${AWS_ACCESS_KEY_ID}
-  key: ${AWS_SECRET_ACCESS_KEY}
-  region: eu-central-1
 

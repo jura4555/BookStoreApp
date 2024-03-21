@@ -12,15 +12,6 @@
 - After you must go root file of project and follow the path: src->main->resources. 
 There you will see the apl.yaml file and in it you need the url line: jdbc:mysql://${DB_HOST:localhost}:3306/${DB_NAME:BookstoreDB}
   change 3306 to 3307
-## 2. Preparing AWS
-- Sign in to the AWS console: Open a browser and go to the AWS console sign in page (https://aws.amazon.com/). 
-Sign in to your account using your credentials. You need to have all the necessary access rights for further work
-- Create an access key: In the "Security credentials" section, click on the "Create access key" button. 
-This will create a new access key for the selected user. Download or save this data in a safe place.
-- At the top of the search bar, type DynamoDB and click on "DynamoDB" in the drop-down list to go to the DynamoDB console.
-- On the right, you will see the "Create table" button and click on it
-- For the Table name, enter: "BookStoreDBTable"
-- For the Partition key , enter: "uuid" with String type
 
 ## 3. Build project
 
@@ -40,7 +31,7 @@ docker-compose up -d
 After that, you should go to the target folder and execute the following command using the console:
 ``` sh
 
-java -jar -DAWS_ACCESS_KEY_ID="value" -DAWS_SECRET_ACCESS_KEY="value" BookStore-0.0.1-SNAPSHOT.jar
+java -jar BookStore-0.0.1-SNAPSHOT.jar
 ```
 
 # Other documentation
