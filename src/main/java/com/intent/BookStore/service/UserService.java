@@ -14,12 +14,12 @@ public interface UserService {
 
     User getUserByUsername(String username);
 
-    User createUser(User user);
-
     User updateUser(Long id, User updatedUser);
 
     User changeUserPassword(Long id, ChangePasswordDTO changePasswordDTO);
     
     User increaseAccountBalance(Long id, BigDecimal amount);
+
+    User updateRole(Long id, String role);
 
 }

@@ -10,16 +10,13 @@ public interface OrderService {
 
     Order getOrderById(Long id);
 
+    OrderItem getOrderItemById(Long id);
+
     Order createOrder(User user);
 
-    void deleteOrderItem(Long id);
+    void deleteOrderItem(OrderItem orderItem);
 
-    void deleteOrder(Long id);
+    void deleteOrder(Order order);
 
-    Order closeOrder(Long id);
-
-    //closed ++
-
-
-    //changeOrderItemQuantity - як ідея проте зараз це не є правильним
+    Order closeOrder(Order order);
 }

@@ -3,6 +3,7 @@ package com.intent.BookStore.service.impl;
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.exception.IncorrectPasswordException;
 import com.intent.BookStore.exception.PasswordMismatchException;
+import com.intent.BookStore.exception.RoleChangeForbiddenException;
 import com.intent.BookStore.exception.UserNotFoundException;
 import com.intent.BookStore.model.User;
 import com.intent.BookStore.repository.UserRepository;
@@ -48,17 +49,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User createUser(User user) {
-        user.setAccountBalance(BigDecimal.ZERO);
-        return userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
     public User updateUser(Long id, User updatedUser) {
         User existUser = getUserById(id);
         updatedUser.setId(id);
         updatedUser.setPassword(existUser.getPassword());
+        updatedUser.setRole(existUser.getRole());
         return userRepository.save(updatedUser);
     }
 
@@ -81,6 +76,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(existUser);
     }
 
+    @Override
+    @Transactional
+    public User updateRole(Long id, String role){
+        User existUser = getUserById(id);
+        existUser.setRole(User.Role.valueOf(role));
+        validateRoleChange(existUser);
+        return userRepository.save(existUser);
+    }
+
     private void checkConfirmPassword(String newPassword, String confirmPassword) {
         if(! newPassword.equals(confirmPassword)){
             throw new PasswordMismatchException(PASSWORD_MISMATCH_ERROR_MESSAGE);
@@ -92,5 +96,12 @@ public class UserServiceImpl implements UserService {
             throw new IncorrectPasswordException(INCORRECT_PASSWORD_ERROR_MESSAGE);
         }
     }
+
+    private void validateRoleChange(User existUser) {
+        if (existUser.getRole() == User.Role.ADMIN) {
+            throw new RoleChangeForbiddenException(ROLE_CHANGE_FORBIDDEN_EXCEPTION);
+        }
+    }
+
 
 }

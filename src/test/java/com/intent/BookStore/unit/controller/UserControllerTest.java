@@ -13,8 +13,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import static com.intent.BookStore.unit.util.TestUserDataUtil.*;
@@ -84,61 +88,99 @@ class UserControllerTest {
     }
 
     @Test
-    void createUserTest() {
-        UserDTO userDTO = TestUserDataUtil.getUserDTO1().setId(0L);
-        UserDTO createdUserDTO = TestUserDataUtil.getUserDTO1();
-        ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.CREATED).body(createdUserDTO);
+    void getUserTest() {
+        UserDTO userDTO = TestUserDataUtil.getUserDTO1();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
+        ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(userDTO);
 
-        when(userFacadeImpl.createUser(userDTO)).thenReturn(createdUserDTO);
+        when(userFacadeImpl.getUserByUsername(USERNAME_1)).thenReturn(userDTO);
 
-        ResponseEntity<UserDTO> resultResponseEntity = userController.createUser(userDTO);
+        ResponseEntity<UserDTO> resultResponseEntity = userController.getUser(authentication);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(userFacadeImpl).createUser(userDTO);
+        verify(userFacadeImpl).getUserByUsername(USERNAME_1);
     }
 
+//    @Test
+//    void createUserTest() {
+//        UserDTO userDTO = TestUserDataUtil.getUserDTO1().setId(0L);
+//        UserDTO createdUserDTO = TestUserDataUtil.getUserDTO1();
+//        ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.CREATED).body(createdUserDTO);
+//
+//        when(userFacadeImpl.createUser(userDTO)).thenReturn(createdUserDTO);
+//
+//        ResponseEntity<UserDTO> resultResponseEntity = userController.createUser(userDTO);
+//
+//        assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
+//        assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
+//        verify(userFacadeImpl).createUser(userDTO);
+//    }
+
     @Test
-    void updateBookTest() {
+    void updateUserTest() {
         UserDTO userDTO = TestUserDataUtil.getUserDTO1().setId(0L);
         UserDTO updatedUserDTO = TestUserDataUtil.getUserDTO1();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
         ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(updatedUserDTO);
 
-        when(userFacadeImpl.updateUser(USER_ID_1, userDTO)).thenReturn(updatedUserDTO);
+        when(userFacadeImpl.updateUser(authentication, userDTO)).thenReturn(updatedUserDTO);
 
-        ResponseEntity<UserDTO> resultResponseEntity = userController.updateUser(USER_ID_1, userDTO);
+        ResponseEntity<UserDTO> resultResponseEntity = userController.updateUser(authentication, userDTO);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(userFacadeImpl).updateUser(USER_ID_1, userDTO);
+        verify(userFacadeImpl).updateUser(authentication, userDTO);
     }
 
     @Test
     void updateUserPasswordTest() {
         UserDTO userDTO = TestUserDataUtil.getUserDTO1().setPassword(PASSWORD_NEW);
         ChangePasswordDTO changePasswordDTO = TestUserDataUtil.getChangePasswordDTO();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
         ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(userDTO);
 
-        when(userFacadeImpl.updateUserPassword(USER_ID_1, changePasswordDTO)).thenReturn(userDTO);
+        when(userFacadeImpl.updateUserPassword(authentication, changePasswordDTO)).thenReturn(userDTO);
 
-        ResponseEntity<UserDTO> resultResponseEntity = userController.updateUserPassword(USER_ID_1, changePasswordDTO);
+        ResponseEntity<UserDTO> resultResponseEntity = userController.updateUserPassword(authentication, changePasswordDTO);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(userFacadeImpl).updateUserPassword(USER_ID_1, changePasswordDTO);
+        verify(userFacadeImpl).updateUserPassword(authentication, changePasswordDTO);
     }
 
     @Test
     void increaseAccountBalanceTest() {
         UserDTO userDTO = TestUserDataUtil.getUserDTO1();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
         ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(userDTO);
 
-        when(userFacadeImpl.increaseAccountBalance(USER_ID_1, AMOUNT)).thenReturn(userDTO);
+        when(userFacadeImpl.increaseAccountBalance(authentication, AMOUNT)).thenReturn(userDTO);
 
-        ResponseEntity<UserDTO> resultResponseEntity = userController.increaseAccountBalance(USER_ID_1, AMOUNT);
+        ResponseEntity<UserDTO> resultResponseEntity = userController.increaseAccountBalance(authentication, AMOUNT);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(userFacadeImpl).increaseAccountBalance(USER_ID_1, AMOUNT);
+        verify(userFacadeImpl).increaseAccountBalance(authentication, AMOUNT);
     }
+
+    @Test
+    void updateUserRoleTest() {
+        UserDTO userDTO = TestUserDataUtil.getUserDTO1();
+        ResponseEntity<UserDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(userDTO);
+
+        when(userFacadeImpl.updateRole(USER_ID_1, ROLE_1.name())).thenReturn(userDTO);
+
+        ResponseEntity<UserDTO> resultResponseEntity = userController.updateUserRole(USER_ID_1, ROLE_1.name());
+
+        assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
+        assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
+        verify(userFacadeImpl).updateRole(USER_ID_1, ROLE_1.name());
+    }
+
+
 }

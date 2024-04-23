@@ -52,10 +52,6 @@ public class BookFacadeImpl implements BookFacade {
         return toBookDto(updatedBook);
     }
 
-    @Override
-    public void deleteBook(Long id) {
-        bookService.deleteBook(id);
-    }
 
     @Override
     public Page<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize) {

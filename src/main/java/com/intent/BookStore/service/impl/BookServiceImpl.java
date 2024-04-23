@@ -64,12 +64,6 @@ public class BookServiceImpl implements BookService {
         return bookRepository.save(updatedBook);
     }
 
-    @Override
-    @Transactional
-    public void deleteBook(Long id) {
-        checkIfBookNotExist(id);
-        bookRepository.deleteById(id);
-    }
 
     @Override
     @Transactional

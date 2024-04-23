@@ -59,8 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void deleteOrderItem(Long id) {
-        OrderItem orderItem = getOrderItemById(id);
+    public void deleteOrderItem(OrderItem orderItem) {
         Order order = orderItem.getOrder();
         Book book = orderItem.getBook();
         checkOrderStatus(order);
@@ -68,24 +67,23 @@ public class OrderServiceImpl implements OrderService {
         increaseBookQuantity(book, orderItem);
         removeFromOrder(order, orderItem);
         deleteOrSaveOrder(order);
-        deleteOrderItem(orderItem);
+        deleteOrderItemEntity(orderItem);
     }
+
 
     @Override
     @Transactional
-    public void deleteOrder(Long id) {
-        Order order = getOrderById(id);
+    public void deleteOrder(Order order) {
         checkOrderStatus(order);
         Set<OrderItem> orderItems = order.getOrderItems();
         restoreBookQuantities(orderItems);
         deleteOrderItems(orderItems);
-        deleteOrder(order);
+        deleteOrderEntity(order);
     }
 
     @Override
     @Transactional
-    public Order closeOrder(Long id) {
-        Order order = getOrderById(id);
+    public Order closeOrder(Order order) {
         User user = order.getUser();
         checkOrderStatus(order);
         checkUserBalance(order, user);
@@ -106,6 +104,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
     public OrderItem getOrderItemById(Long id) {
         return orderItemRepository.findById(id)
                 .orElseThrow(() -> new OrderItemNotFoundException(String.format(ORDER_ITEM_NOT_FOUND_BY_ID_ERROR_MESSAGE, id)));
@@ -189,6 +188,10 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    private void deleteOrderItemEntity(OrderItem orderItem) {
+        orderItemRepository.delete(orderItem);
+    }
+
     private void removeOrderFromUserAndDelete(Order order) {
         User user = order.getUser();
         Set<Order> orders = user.getOrders();
@@ -202,11 +205,8 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    private void deleteOrderItem(OrderItem orderItem) {
-        orderItemRepository.delete(orderItem);
-    }
 
-    private void deleteOrder(Order order) {
+    private void deleteOrderEntity(Order order) {
         orderRepository.delete(order);
     }
 

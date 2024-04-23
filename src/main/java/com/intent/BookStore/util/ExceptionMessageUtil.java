@@ -12,8 +12,9 @@ public class ExceptionMessageUtil {
     public static final String ORDER_ITEM_NOT_FOUND_BY_ID_ERROR_MESSAGE = "OrderItem with id: %d is not found";
     public static final String ORDER_CLOSED_ERROR_MESSAGE = "Cannot perform operation because order with id: %d is closed";
     public static final String INSUFFICIENT_FUNDS_ERROR_MESSAGE = "There is not enough money in the account to complete the purchase";
-
-
+    public static final String INVALID_JWT_AUTHENTICATION_EXCEPTION = "Invalid token: %s";
+    public static final String AUTHENTICATION_EXCEPTION = "Incorrect username or password!!!";
+    public static final String ROLE_CHANGE_FORBIDDEN_EXCEPTION = "Changing user role to ADMIN is not allowed";
 
 
 }

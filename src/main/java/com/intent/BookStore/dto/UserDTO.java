@@ -3,6 +3,7 @@ package com.intent.BookStore.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.intent.BookStore.dto.validation.group.OnCreate;
 import com.intent.BookStore.dto.validation.group.OnUpdate;
+import com.intent.BookStore.model.User;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -35,6 +36,9 @@ public class UserDTO {
 
     @Null(message = "Account balance must be null")
     private BigDecimal accountBalance;
+
+    @Null(message = "Role must be null")
+    private User.Role role;
 
     private Set<OrderDTO> orders;
 

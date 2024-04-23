@@ -17,8 +17,6 @@ public interface BookService {
 
     Book updateBook(Long id, Book updatedBook);
 
-    void deleteBook(Long id);
-
     Page<Book> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize);
 
 }

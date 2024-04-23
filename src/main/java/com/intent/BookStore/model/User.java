@@ -34,6 +34,15 @@ public class User {
     @Column(name = "account_balance")
     private BigDecimal accountBalance;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Order> orders;
+
+    public enum Role {
+        ADMIN,
+        MANAGER,
+        USER
+    }
 }

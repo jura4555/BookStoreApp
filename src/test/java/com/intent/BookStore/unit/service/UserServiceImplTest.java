@@ -3,6 +3,7 @@ package com.intent.BookStore.unit.service;
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.exception.IncorrectPasswordException;
 import com.intent.BookStore.exception.PasswordMismatchException;
+import com.intent.BookStore.exception.RoleChangeForbiddenException;
 import com.intent.BookStore.exception.UserNotFoundException;
 import com.intent.BookStore.model.User;
 import com.intent.BookStore.repository.UserRepository;
@@ -38,6 +39,7 @@ class UserServiceImplTest {
     private  static final String USERNAME_UPDATE = "alex_brown";
     private static final String PHONE_UPDATE = "+380681714959";
     private static final BigDecimal AMOUNT = BigDecimal.valueOf(100.00);
+    private static final User.Role ROLE = User.Role.MANAGER;
 
     @Test
     void getAllUserTest() {
@@ -65,7 +67,8 @@ class UserServiceImplTest {
                 hasProperty("password", equalTo(user.getPassword())),
                 hasProperty("email", equalTo(user.getEmail())),
                 hasProperty("phoneNumber", equalTo(user.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(user.getAccountBalance()))
+                hasProperty("accountBalance", equalTo(user.getAccountBalance())),
+                hasProperty("role", equalTo(user.getRole()))
         ));
         verify(userRepository, times(1)).findById(USER_ID_1);
     }
@@ -87,7 +90,8 @@ class UserServiceImplTest {
                 hasProperty("password", equalTo(user.getPassword())),
                 hasProperty("email", equalTo(user.getEmail())),
                 hasProperty("phoneNumber", equalTo(user.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(user.getAccountBalance()))
+                hasProperty("accountBalance", equalTo(user.getAccountBalance())),
+                hasProperty("role", equalTo(user.getRole()))
         ));
         verify(userRepository, times(1)).findByUsername(USERNAME_1);
     }
@@ -96,24 +100,6 @@ class UserServiceImplTest {
     void getUserByUsernameWithNotFoundExceptionTest(){
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername(anyString()));
-    }
-
-
-    @Test
-    void createUserTest() {
-        User user = TestUserDataUtil.getUser1().setId(0L);
-        User createdUser = TestUserDataUtil.getUser1();
-        when(userRepository.save(user)).thenReturn(createdUser);
-        User result = userService.createUser(user);
-        assertThat(result, allOf(
-                hasProperty("id", equalTo(createdUser.getId())),
-                hasProperty("username", equalTo(createdUser.getUsername())),
-                hasProperty("password", equalTo(createdUser.getPassword())),
-                hasProperty("email", equalTo(createdUser.getEmail())),
-                hasProperty("phoneNumber", equalTo(createdUser.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(createdUser.getAccountBalance()))
-        ));
-        verify(userRepository, times(1)).save(user);
     }
 
     @Test
@@ -131,7 +117,8 @@ class UserServiceImplTest {
                 hasProperty("password", equalTo(updatedUser.getPassword())),
                 hasProperty("email", equalTo(updatedUser.getEmail())),
                 hasProperty("phoneNumber", equalTo(updatedUser.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(updatedUser.getAccountBalance()))
+                hasProperty("accountBalance", equalTo(updatedUser.getAccountBalance())),
+                hasProperty("role", equalTo(updatedUser.getRole()))
         ));
         verify(userRepository, times(1)).findById(USER_ID_1);
         verify(userRepository, times(1)).save(updatedUser);
@@ -152,7 +139,8 @@ class UserServiceImplTest {
                 hasProperty("password", equalTo(user.getPassword())),
                 hasProperty("email", equalTo(user.getEmail())),
                 hasProperty("phoneNumber", equalTo(user.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(user.getAccountBalance()))
+                hasProperty("accountBalance", equalTo(user.getAccountBalance())),
+                hasProperty("role", equalTo(user.getRole()))
         ));
         verify(userRepository, times(1)).findById(USER_ID_1);
         verify(userRepository, times(1)).save(user);
@@ -188,10 +176,38 @@ class UserServiceImplTest {
                 hasProperty("password", equalTo(user.getPassword())),
                 hasProperty("email", equalTo(user.getEmail())),
                 hasProperty("phoneNumber", equalTo(user.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(user.getAccountBalance()))
+                hasProperty("accountBalance", equalTo(user.getAccountBalance())),
+                hasProperty("role", equalTo(user.getRole()))
+                ));
+        verify(userRepository, times(1)).findById(USER_ID_1);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void updateRoleTest() {
+        User user = TestUserDataUtil.getUser1();
+        when(userRepository.findById(USER_ID_1)).thenReturn(Optional.of(user));
+        user.setRole(ROLE);
+        when(userRepository.save(user)).thenReturn(user);
+        User result = userService.updateRole(USER_ID_1, ROLE.name());
+        assertThat(result, allOf(
+                hasProperty("id", equalTo(user.getId())),
+                hasProperty("username", equalTo(user.getUsername())),
+                hasProperty("password", equalTo(user.getPassword())),
+                hasProperty("email", equalTo(user.getEmail())),
+                hasProperty("phoneNumber", equalTo(user.getPhoneNumber())),
+                hasProperty("accountBalance", equalTo(user.getAccountBalance())),
+                hasProperty("role", equalTo(user.getRole()))
         ));
         verify(userRepository, times(1)).findById(USER_ID_1);
         verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void updateRoleWithRoleChangeForbiddenExceptionTest() {
+        User user = TestUserDataUtil.getUser1();
+        when(userRepository.findById(USER_ID_1)).thenReturn(Optional.of(user));
+        assertThrows(RoleChangeForbiddenException.class, () -> userService.updateRole(USER_ID_1, User.Role.ADMIN.name()));
     }
 
 }

@@ -2,7 +2,6 @@ package com.intent.BookStore.controller;
 
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.UserDTO;
-import com.intent.BookStore.dto.validation.group.OnCreate;
 import com.intent.BookStore.dto.validation.group.OnUpdate;
 import com.intent.BookStore.facade.UserFacade;
 import jakarta.validation.Valid;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserFacade userFacade;
@@ -45,28 +44,33 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<UserDTO> createUser(@Validated(OnCreate.class) @RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userFacade.createUser(userDTO);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    @GetMapping("/users/me")
+    public ResponseEntity<UserDTO> getUser(Authentication authentication) {
+        UserDTO user = userFacade.getUserByUsername(authentication.getName());
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Validated(OnUpdate.class) @RequestBody UserDTO updatedUserDTO) {
-        UserDTO updatedUser = userFacade.updateUser(id, updatedUserDTO);
+    @PutMapping("/users/me")
+    public ResponseEntity<UserDTO> updateUser(Authentication authentication, @Validated(OnUpdate.class) @RequestBody UserDTO updatedUserDTO) {
+        UserDTO updatedUser = userFacade.updateUser(authentication, updatedUserDTO);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    @PatchMapping("/users/{id}")
-    public ResponseEntity<UserDTO> updateUserPassword(@PathVariable Long id, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
-        UserDTO userDTO = userFacade.updateUserPassword(id, changePasswordDTO);
+    @PatchMapping("/users/me/password")
+    public ResponseEntity<UserDTO> updateUserPassword(Authentication authentication, @Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
+        UserDTO userDTO = userFacade.updateUserPassword(authentication, changePasswordDTO);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
-    @PatchMapping("/users/{id}/increase-balance")
-    public ResponseEntity<UserDTO> increaseAccountBalance(@PathVariable Long id, @RequestParam BigDecimal amount) {
-        UserDTO userDTO = userFacade.increaseAccountBalance(id, amount);
+    @PatchMapping("/users/me/balance")
+    public ResponseEntity<UserDTO> increaseAccountBalance(Authentication authentication, @RequestParam BigDecimal amount) {
+        UserDTO userDTO = userFacade.increaseAccountBalance(authentication, amount);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
+    @PatchMapping("/users/{id}/role")
+    public ResponseEntity<UserDTO> updateUserRole(@PathVariable Long id, @RequestParam String role) {
+        UserDTO userDTO = userFacade.updateRole(id, role);
+        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
 }

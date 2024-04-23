@@ -3,6 +3,7 @@ package com.intent.BookStore.facade;
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.UserDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 
@@ -15,12 +16,11 @@ public interface UserFacade {
 
     UserDTO getUserByUsername(String username);
 
-    UserDTO createUser(UserDTO userDTO);
+    UserDTO updateUser(Authentication authentication, UserDTO updatedUserDTO);
 
-    UserDTO updateUser(Long id, UserDTO updatedUserDTO);
+    UserDTO updateUserPassword(Authentication authentication, ChangePasswordDTO changePasswordDTO);
 
-    UserDTO updateUserPassword(Long id, ChangePasswordDTO changePasswordDTO);
+    UserDTO increaseAccountBalance(Authentication authentication, BigDecimal amount);
 
-    UserDTO increaseAccountBalance(Long id, BigDecimal amount);
-
+    UserDTO updateRole(Long id, String role);
 }

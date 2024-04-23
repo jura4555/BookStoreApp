@@ -1,29 +1,33 @@
 package com.intent.BookStore.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intent.BookStore.aspect.ControllerAspect;
-import com.intent.BookStore.aws.DynamoClient;
-import com.intent.BookStore.config.DynamoDBConfig;
-import com.intent.BookStore.controller.BookController;
 import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.facade.impl.BookFacadeImpl;
 import com.intent.BookStore.integration.AbstractTestContainer;
+import com.intent.BookStore.model.User;
 import com.intent.BookStore.repository.BookRepository;
+import com.intent.BookStore.repository.UserRepository;
+import com.intent.BookStore.security.jwt.JwtTokenProvider;
 import com.intent.BookStore.unit.util.TestBookDataUtil;
+import com.intent.BookStore.unit.util.TestUserDataUtil;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static com.intent.BookStore.unit.util.TestBookDataUtil.*;
+import static com.intent.BookStore.unit.util.TestUserDataUtil.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,8 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@MockBeans({ @MockBean(ControllerAspect.class), @MockBean(DynamoClient.class), @MockBean(DynamoDBConfig.class) })
 class BookControllerIntegrationTest extends AbstractTestContainer {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private BookFacadeImpl bookFacade;
@@ -40,18 +46,26 @@ class BookControllerIntegrationTest extends AbstractTestContainer {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserRepository userRepository;
+
     private MockMvc mockMvc;
-
-
 
     @BeforeAll
     public static void setup() {
         setUp();
     }
 
+
     @BeforeEach
-    public void setupMVC() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new BookController(bookFacade)).build();
+    void setUpMVC() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
     }
 
     @AfterAll
@@ -125,8 +139,12 @@ class BookControllerIntegrationTest extends AbstractTestContainer {
 
     @Test
     void createBookTest() throws Exception {
+        User user = TestUserDataUtil.getUser1().setId(0L);
+        userRepository.save(user);
+        String token = jwtTokenProvider.createToken(USERNAME_1, List.of(ROLE_1.name()));
         BookDTO book = TestBookDataUtil.getBookDTO1().setId(0l);
         mockMvc.perform(post("/books")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .contentType("application/json")
                 .content(new ObjectMapper().writeValueAsString(book))
         )
@@ -141,15 +159,20 @@ class BookControllerIntegrationTest extends AbstractTestContainer {
                 .andExpect(jsonPath("$.imageURL", is(book.getImageURL())));
 
         bookRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     void updateBookTest() throws Exception {
+        User user = TestUserDataUtil.getUser1().setId(0L);
+        userRepository.save(user);
+        String token = jwtTokenProvider.createToken(USERNAME_1, List.of(ROLE_1.name()));
         BookDTO book = TestBookDataUtil.getBookDTO1().setId(0l);
         BookDTO createdBookDTO = bookFacade.createBook(book);
         BookDTO bookDTOForUpdate = TestBookDataUtil.getBookDTO2().setId(0L);
 
         mockMvc.perform(put("/books/{id}", createdBookDTO.getId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType("application/json")
                         .content(new ObjectMapper().writeValueAsString(bookDTOForUpdate))
                 )
@@ -165,15 +188,7 @@ class BookControllerIntegrationTest extends AbstractTestContainer {
                 .andExpect(jsonPath("$.imageURL", is(bookDTOForUpdate.getImageURL())));
 
         bookRepository.deleteAll();
-    }
-
-    @Test
-    void deleteBookTest() throws Exception {
-        BookDTO book = TestBookDataUtil.getBookDTO1().setId(0l);
-        BookDTO createdBookDTO = bookFacade.createBook(book);
-        mockMvc.perform(delete("/books/{id}", createdBookDTO.getId()))
-                .andDo(print())
-                .andExpect(status().isNoContent());
+        userRepository.deleteAll();
     }
 
     @Test

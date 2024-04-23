@@ -7,44 +7,44 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class OrderController {
 
     private final OrderFacade orderFacade;
 
     @GetMapping("/orders/{id}")
-    public ResponseEntity<OrderDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
         OrderDTO order = orderFacade.getOrderById(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     @PostMapping("/orders")
     public ResponseEntity<OrderDTO> createOrderItem(
-            @RequestParam(required = false, defaultValue = "0") long userId,
+            Authentication authentication,
             @Valid @RequestBody OrderItemDTO orderItemDTO) {
-        OrderDTO orderDTO = orderFacade.createOrderItem(orderItemDTO, userId);
+        OrderDTO orderDTO = orderFacade.createOrderItem(authentication, orderItemDTO);
         return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/orders/item/{id}")
-    public ResponseEntity<Void> deleteOrderItem(@PathVariable Long id) {
-        orderFacade.deleteOrderItem(id);
+    public ResponseEntity<Void> deleteOrderItem(Authentication authentication, @PathVariable Long id) {
+        orderFacade.deleteOrderItem(authentication, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/orders/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        orderFacade.deleteOrder(id);
+    public ResponseEntity<Void> deleteOrder(Authentication authentication, @PathVariable Long id) {
+        orderFacade.deleteOrder(authentication, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping("/orders/{id}/close")
-    public ResponseEntity<OrderDTO> closeOrder(@PathVariable Long id) {
-        OrderDTO closedOrder = orderFacade.closeOrder(id);
+    public ResponseEntity<OrderDTO> closeOrder(Authentication authentication, @PathVariable Long id) {
+        OrderDTO closedOrder = orderFacade.closeOrder(authentication, id);
         return ResponseEntity.ok(closedOrder);
     }
 

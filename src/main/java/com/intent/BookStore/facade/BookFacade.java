@@ -17,8 +17,6 @@ public interface BookFacade {
 
     BookDTO updateBook(Long id, BookDTO updatedBookDTO);
 
-    void deleteBook(Long id);
-
     Page<BookDTO> getAllBooksByCriteria(String authorName, String genre, BigDecimal minPrice, BigDecimal maxPrice, int quantity, int pageNum, int pageSize);
 
 }

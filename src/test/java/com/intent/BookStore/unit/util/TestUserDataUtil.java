@@ -1,6 +1,7 @@
 package com.intent.BookStore.unit.util;
 
 import com.intent.BookStore.dto.ChangePasswordDTO;
+import com.intent.BookStore.dto.LoginDTO;
 import com.intent.BookStore.dto.UserDTO;
 import com.intent.BookStore.model.User;
 
@@ -16,6 +17,8 @@ public class TestUserDataUtil {
     public static final String PHONE_NUMBER_1 = "+380685214759";
     public static final BigDecimal ACCOUNT_BALANCE_1 = BigDecimal.valueOf(100);
 
+    public static final User.Role ROLE_1 = User.Role.ADMIN;
+
     public static final String PASSWORD_NEW = "newPassword1452";
 
     public static final long USER_ID_2 = 2L;
@@ -25,6 +28,9 @@ public class TestUserDataUtil {
     public static final String PHONE_NUMBER_2 = "+380685244771";
     public static final BigDecimal ACCOUNT_BALANCE_2 = BigDecimal.valueOf(200);
 
+    public static final User.Role ROLE_2 = User.Role.MANAGER;
+
+
     public static User getUser1() {
         return new User()
                 .setId(USER_ID_1)
@@ -32,7 +38,8 @@ public class TestUserDataUtil {
                 .setPassword(PASSWORD_1)
                 .setEmail(EMAIL_1)
                 .setPhoneNumber(PHONE_NUMBER_1)
-                .setAccountBalance(ACCOUNT_BALANCE_1);
+                .setAccountBalance(ACCOUNT_BALANCE_1)
+                .setRole(ROLE_1);
     }
 
     public static User getUser2() {
@@ -42,7 +49,8 @@ public class TestUserDataUtil {
                 .setPassword(PASSWORD_2)
                 .setEmail(EMAIL_2)
                 .setPhoneNumber(PHONE_NUMBER_2)
-                .setAccountBalance(ACCOUNT_BALANCE_2);
+                .setAccountBalance(ACCOUNT_BALANCE_2)
+                .setRole(ROLE_2);
     }
 
     public static UserDTO getUserDTO1() {
@@ -52,7 +60,8 @@ public class TestUserDataUtil {
                 .setPassword(PASSWORD_1)
                 .setEmail(EMAIL_1)
                 .setPhoneNumber(PHONE_NUMBER_1)
-                .setAccountBalance(ACCOUNT_BALANCE_1);
+                .setAccountBalance(ACCOUNT_BALANCE_1)
+                .setRole(ROLE_1);
     }
 
     public static UserDTO getUserDTO2() {
@@ -62,7 +71,8 @@ public class TestUserDataUtil {
                 .setPassword(PASSWORD_2)
                 .setEmail(EMAIL_2)
                 .setPhoneNumber(PHONE_NUMBER_2)
-                .setAccountBalance(ACCOUNT_BALANCE_2);
+                .setAccountBalance(ACCOUNT_BALANCE_2)
+                .setRole(ROLE_2);
     }
 
     public static ChangePasswordDTO getChangePasswordDTO() {
@@ -70,6 +80,12 @@ public class TestUserDataUtil {
                 .setCurrentPassword(PASSWORD_1)
                 .setNewPassword(PASSWORD_NEW)
                 .setConfirmPassword(PASSWORD_NEW);
+    }
+
+    public static LoginDTO getLoginDTO1() {
+        return new LoginDTO()
+                .setUsername(USERNAME_1)
+                .setPassword(PASSWORD_1);
     }
 
 }

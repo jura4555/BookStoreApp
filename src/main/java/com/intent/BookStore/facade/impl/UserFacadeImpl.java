@@ -8,6 +8,7 @@ import com.intent.BookStore.model.User;
 import com.intent.BookStore.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -42,25 +43,25 @@ public class UserFacadeImpl implements UserFacade {
     }
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        User createdUser = userService.createUser(toUser(userDTO));
-        return toUserDTO(createdUser);
+    public UserDTO updateUser(Authentication authentication, UserDTO updatedUserDTO) {
+        Long userId = userService.getUserByUsername(authentication.getName()).getId();
+        return toUserDTO(userService.updateUser(userId, toUser(updatedUserDTO)));
     }
 
     @Override
-    public UserDTO updateUser(Long id, UserDTO updatedUserDTO) {
-        User undatedUser = userService.updateUser(id, toUser(updatedUserDTO));
-        return toUserDTO(undatedUser);
+    public UserDTO updateUserPassword(Authentication authentication, ChangePasswordDTO changePasswordDTO) {
+        Long userId = userService.getUserByUsername(authentication.getName()).getId();
+        return toUserDTO(userService.changeUserPassword(userId, changePasswordDTO));
     }
 
     @Override
-    public UserDTO updateUserPassword(Long id, ChangePasswordDTO changePasswordDTO) {
-        User undatedUser = userService.changeUserPassword(id, changePasswordDTO);
-        return toUserDTO(undatedUser);
+    public UserDTO increaseAccountBalance(Authentication authentication, BigDecimal amount) {
+        Long userId = userService.getUserByUsername(authentication.getName()).getId();
+        return toUserDTO(userService.increaseAccountBalance(userId, amount));
     }
 
     @Override
-    public UserDTO increaseAccountBalance(Long id, BigDecimal amount) {
-        return toUserDTO(userService.increaseAccountBalance(id, amount));
+    public UserDTO updateRole(Long id, String role) {
+        return toUserDTO(userService.updateRole(id, role));
     }
 }

@@ -13,12 +13,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import static com.intent.BookStore.unit.util.TestBookDataUtil.BOOK_ID_1;
+import java.util.Collections;
+
 import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_1;
-import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_2;
 import static com.intent.BookStore.unit.util.TestOrderItemDataUtil.ORDER_ITEM_ID_1;
-import static com.intent.BookStore.unit.util.TestUserDataUtil.USER_ID_2;
+import static com.intent.BookStore.unit.util.TestUserDataUtil.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -35,6 +38,8 @@ class OrderControllerTest {
 
     @Test
     void createOrderItemTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_2, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_2.name())));
         OrderItemDTO orderItemDTO = TestOrderItemDataUtil.getOrderItemDTO4()
                 .setId(0L)
                 .setOrderId(0L)
@@ -42,13 +47,13 @@ class OrderControllerTest {
         OrderDTO orderDTO = TestOrderDataUtil.getOrderDTO2();
         ResponseEntity<OrderDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
 
-        when(orderFacadeImpl.createOrderItem(orderItemDTO, USER_ID_2)).thenReturn(orderDTO);
+        when(orderFacadeImpl.createOrderItem(authentication, orderItemDTO)).thenReturn(orderDTO);
 
-        ResponseEntity<OrderDTO> resultResponseEntity = orderController.createOrderItem(USER_ID_2, orderItemDTO);
+        ResponseEntity<OrderDTO> resultResponseEntity = orderController.createOrderItem(authentication, orderItemDTO);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(orderFacadeImpl).createOrderItem(orderItemDTO, USER_ID_2);
+        verify(orderFacadeImpl).createOrderItem(authentication, orderItemDTO);
     }
 
     @Test
@@ -58,7 +63,7 @@ class OrderControllerTest {
 
         when(orderFacadeImpl.getOrderById(ORDER_ID_1)).thenReturn(orderDTO);
 
-        ResponseEntity<OrderDTO> resultResponseEntity = orderController.getUserById(ORDER_ID_1);
+        ResponseEntity<OrderDTO> resultResponseEntity = orderController.getOrderById(ORDER_ID_1);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
@@ -67,33 +72,38 @@ class OrderControllerTest {
 
     @Test
     void deleteOrderItemTest() {
-        ResponseEntity<Void> resultResponseEntity = orderController.deleteOrderItem(ORDER_ITEM_ID_1);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
+        ResponseEntity<Void> resultResponseEntity = orderController.deleteOrderItem(authentication, ORDER_ITEM_ID_1);
 
         assertThat(resultResponseEntity.getStatusCode(), is(HttpStatus.NO_CONTENT));
-        verify(orderFacadeImpl, times(1)).deleteOrderItem(ORDER_ITEM_ID_1);
+        verify(orderFacadeImpl, times(1)).deleteOrderItem(authentication, ORDER_ITEM_ID_1);
     }
 
     @Test
     void deleteOrderTest() {
-
-        ResponseEntity<Void> resultResponseEntity = orderController.deleteOrder(ORDER_ID_1);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
+        ResponseEntity<Void> resultResponseEntity = orderController.deleteOrder(authentication, ORDER_ID_1);
 
         assertThat(resultResponseEntity.getStatusCode(), is(HttpStatus.NO_CONTENT));
-        verify(orderFacadeImpl, times(1)).deleteOrder(ORDER_ID_1);
+        verify(orderFacadeImpl, times(1)).deleteOrder(authentication, ORDER_ID_1);
     }
 
     @Test
     void closeOrderTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
         OrderDTO orderDTO = TestOrderDataUtil.getOrderDTO1();
         ResponseEntity<OrderDTO> expectedResponseEntity = ResponseEntity.status(HttpStatus.OK).body(orderDTO);
 
-        when(orderFacadeImpl.closeOrder(ORDER_ID_1)).thenReturn(orderDTO);
+        when(orderFacadeImpl.closeOrder(authentication, ORDER_ID_1)).thenReturn(orderDTO);
 
-        ResponseEntity<OrderDTO> resultResponseEntity = orderController.closeOrder(ORDER_ID_1);
+        ResponseEntity<OrderDTO> resultResponseEntity = orderController.closeOrder(authentication, ORDER_ID_1);
 
         assertThat(resultResponseEntity.getBody(), is(expectedResponseEntity.getBody()));
         assertThat(resultResponseEntity.getStatusCode(), is(expectedResponseEntity.getStatusCode()));
-        verify(orderFacadeImpl, times(1)).closeOrder(ORDER_ID_1);
+        verify(orderFacadeImpl, times(1)).closeOrder(authentication, ORDER_ID_1);
     }
 
 

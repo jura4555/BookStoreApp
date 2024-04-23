@@ -11,7 +11,6 @@ import com.intent.BookStore.repository.UserRepository;
 import com.intent.BookStore.service.impl.OrderServiceImpl;
 import com.intent.BookStore.unit.util.TestOrderDataUtil;
 import com.intent.BookStore.unit.util.TestOrderItemDataUtil;
-import com.intent.BookStore.unit.util.TestUserDataUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,8 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_1;
-import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_2;
-import static com.intent.BookStore.unit.util.TestOrderItemDataUtil.ORDER_ITEM_ID_4;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -163,9 +160,7 @@ class OrderServiceImplTest {
         orderItems.add(internalOrderItem2);
         orderItem.getOrder().setOrderItems(orderItems);
 
-        when(orderItemRepository.findById(ORDER_ITEM_ID_4)).thenReturn(Optional.of(orderItem));
-
-        orderService.deleteOrderItem(ORDER_ITEM_ID_4);
+        orderService.deleteOrderItem(orderItem);
 
         verify(orderRepository, times(1)).save(any(Order.class));
         verify(orderItemRepository, times(1)).delete(any(OrderItem.class));
@@ -184,9 +179,8 @@ class OrderServiceImplTest {
         Set<Order> orders = new HashSet<>();
         orders.add(order);
         orderItem.getOrder().getUser().setOrders(orders);
-        when(orderItemRepository.findById(ORDER_ITEM_ID_4)).thenReturn(Optional.of(orderItem));
 
-        orderService.deleteOrderItem(ORDER_ITEM_ID_4);
+        orderService.deleteOrderItem(orderItem);
         verify(userRepository, times(1)).save(any(User.class));
         verify(orderRepository, times(1)).deleteById(anyLong());
         verify(orderItemRepository, times(1)).delete(any(OrderItem.class));
@@ -202,8 +196,8 @@ class OrderServiceImplTest {
         orderItems.add(internalOrderItem1);
         orderItems.add(internalOrderItem2);
         order.setOrderItems(orderItems);
-        when(orderRepository.findById(ORDER_ID_2)).thenReturn(Optional.of(order));
-        orderService.deleteOrder(ORDER_ID_2);
+
+        orderService.deleteOrder(order);
         verify(orderItemRepository, times(1)).deleteAll(orderItems);
         verify(orderRepository, times(1)).delete(any(Order.class));
     }
@@ -214,9 +208,8 @@ class OrderServiceImplTest {
         Order closedOrder = TestOrderDataUtil.getOrder2()
                 .setCompletedAt(LocalDate.now())
                 .setClosed(true);
-        when(orderRepository.findById(ORDER_ID_2)).thenReturn(Optional.of(order));
         when(orderRepository.save(order)).thenReturn(closedOrder);
-        Order result = orderService.closeOrder(ORDER_ID_2);
+        Order result = orderService.closeOrder(order);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(closedOrder.getId())),
                 hasProperty("user", equalTo(closedOrder.getUser())),
@@ -224,7 +217,6 @@ class OrderServiceImplTest {
                 hasProperty("totalPrice", equalTo(closedOrder.getTotalPrice())),
                 hasProperty("completedAt", equalTo(closedOrder.getCompletedAt()))
         ));
-        verify(orderRepository, times(1)).findById(ORDER_ID_2);
         verify(orderRepository, times(1)).save(any(Order.class));
     }
 
@@ -232,9 +224,7 @@ class OrderServiceImplTest {
     void closeOrderWithInsufficientFundsExceptionTest() {
         Order order = TestOrderDataUtil.getOrder2()
                 .setTotalPrice(ORDER_TOTAL_PRICE_EXCEPTION);
-        when(orderRepository.findById(ORDER_ID_2)).thenReturn(Optional.of(order));
-        assertThrows(InsufficientFundsException.class, () -> orderService.closeOrder(ORDER_ID_2));
-
+        assertThrows(InsufficientFundsException.class, () -> orderService.closeOrder(order));
     }
 
 

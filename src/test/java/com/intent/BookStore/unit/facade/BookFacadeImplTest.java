@@ -130,12 +130,6 @@ class BookFacadeImplTest {
     }
 
     @Test
-    void deleteBookTest() {
-        bookFacade.deleteBook(BOOK_ID_1);
-        verify(bookServiceImpl, times(1)).deleteBook(BOOK_ID_1);
-    }
-
-    @Test
     void getAllBooksByCriteriaTest() {
         Book book1 = TestBookDataUtil.getBook1();
         Book book3 = TestBookDataUtil.getBook3();

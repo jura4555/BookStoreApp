@@ -146,17 +146,13 @@ class BookServiceImplTest {
     }
 
     @Test
-    void deleteBookTest() {
-        when(bookRepository.existsById(BOOK_ID_1)).thenReturn(true);
-        bookService.deleteBook(BOOK_ID_1);
-        verify(bookRepository, times(1)).existsById(BOOK_ID_1);
-        verify(bookRepository, times(1)).deleteById(BOOK_ID_1);
-    }
+    void updateBookWithBookNotFoundExceptionTest() {
+        Book updatedBook = TestBookDataUtil.getBook1()
+                .setPrice(PRICE_UPDATE)
+                .setQuantity(QUANTITY_UPDATE);
+        when(bookRepository.existsById(BOOK_ID_1)).thenReturn(false);
+        assertThrows(BookNotFoundException.class, () -> bookService.updateBook(BOOK_ID_1, updatedBook));
 
-    @Test
-    void deleteBookWithNotFoundExceptionTest(){
-        when(bookRepository.existsById(anyLong())).thenReturn(false);
-        assertThrows(BookNotFoundException.class, () -> bookService.deleteBook(anyLong()));
     }
 
     @Test

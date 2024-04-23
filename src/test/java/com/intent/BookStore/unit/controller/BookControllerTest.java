@@ -107,13 +107,6 @@ class BookControllerTest {
         verify(bookFacadeImpl).updateBook(BOOK_ID_1, bookDTO);
     }
 
-    @Test
-    void deleteBookTest() {
-        ResponseEntity<Void> resultResponseEntity = bookController.deleteBook(BOOK_ID_1);
-
-        assertThat(resultResponseEntity.getStatusCode(), is(HttpStatus.NO_CONTENT));
-        verify(bookFacadeImpl, times(1)).deleteBook(BOOK_ID_1);
-    }
 
     @Test
     void getAllBooksByCriteriaTest() {

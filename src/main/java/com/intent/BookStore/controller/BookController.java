@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class BookController {
 
     private final BookFacade bookFacade;
@@ -52,13 +51,6 @@ public class BookController {
         BookDTO updatedBook = bookFacade.updateBook(id, updatedBookDTO);
         return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
-
-    @DeleteMapping("/books/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
-        bookFacade.deleteBook(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
     @GetMapping("/books/search")
     public ResponseEntity<Page<BookDTO>> getAllBooksByCriteria(
             @RequestParam(required = false, defaultValue = "") String authorName,

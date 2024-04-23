@@ -1,15 +1,12 @@
 package com.intent.BookStore.unit.facade;
 
-import com.intent.BookStore.dto.BookDTO;
 import com.intent.BookStore.dto.ChangePasswordDTO;
 import com.intent.BookStore.dto.OrderDTO;
 import com.intent.BookStore.dto.UserDTO;
 import com.intent.BookStore.facade.impl.UserFacadeImpl;
-import com.intent.BookStore.model.Book;
 import com.intent.BookStore.model.Order;
 import com.intent.BookStore.model.User;
 import com.intent.BookStore.service.impl.UserServiceImpl;
-import com.intent.BookStore.unit.util.TestBookDataUtil;
 import com.intent.BookStore.unit.util.TestOrderDataUtil;
 import com.intent.BookStore.unit.util.TestUserDataUtil;
 import org.junit.jupiter.api.Test;
@@ -18,14 +15,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.intent.BookStore.unit.util.TestUserDataUtil.USERNAME_1;
-import static com.intent.BookStore.unit.util.TestUserDataUtil.USER_ID_1;
+import static com.intent.BookStore.unit.util.TestUserDataUtil.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +45,8 @@ class UserFacadeImplTest {
     private static final int PAGE_SIZE = 2;
 
     private static final BigDecimal AMOUNT = BigDecimal.valueOf(100.00);
+
+    private static final User.Role ROLE = User.Role.USER;
 
     @Test
     void getAllUserTest() {
@@ -106,28 +108,14 @@ class UserFacadeImplTest {
     }
 
     @Test
-    void createUserTest() {
-        User createdUser = TestUserDataUtil.getUser1();
-        UserDTO userDTO = TestUserDataUtil.getUserDTO1().setId(0L);
-        when(userServiceImpl.createUser(any(User.class))).thenReturn(createdUser);
-        UserDTO result = userFacade.createUser(userDTO);
-        assertThat(result, allOf(
-                hasProperty("id", equalTo(USER_ID_1)),
-                hasProperty("username", equalTo(userDTO.getUsername())),
-                hasProperty("password", equalTo(userDTO.getPassword())),
-                hasProperty("email", equalTo(userDTO.getEmail())),
-                hasProperty("phoneNumber", equalTo(userDTO.getPhoneNumber())),
-                hasProperty("accountBalance", equalTo(userDTO.getAccountBalance()))
-        ));
-        verify(userServiceImpl, times(1)).createUser(any(User.class));
-    }
-
-    @Test
     void updateBookTest() {
         User updatedUser = TestUserDataUtil.getUser1();
         UserDTO userDTO = TestUserDataUtil.getUserDTO1().setId(0L);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(updatedUser.getUsername(), "",
+                Collections.singleton(new SimpleGrantedAuthority(updatedUser.getRole().name())));
+        when(userServiceImpl.getUserByUsername(USERNAME_1)).thenReturn(updatedUser);
         when(userServiceImpl.updateUser(eq(USER_ID_1), any(User.class))).thenReturn(updatedUser);
-        UserDTO result = userFacade.updateUser(USER_ID_1, userDTO);
+        UserDTO result = userFacade.updateUser(authentication, userDTO);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(USER_ID_1)),
                 hasProperty("username", equalTo(userDTO.getUsername())),
@@ -136,6 +124,7 @@ class UserFacadeImplTest {
                 hasProperty("phoneNumber", equalTo(userDTO.getPhoneNumber())),
                 hasProperty("accountBalance", equalTo(userDTO.getAccountBalance()))
         ));
+        verify(userServiceImpl, times(1)).getUserByUsername(USERNAME_1);
         verify(userServiceImpl, times(1)).updateUser(eq(USER_ID_1), any(User.class));
     }
 
@@ -143,9 +132,12 @@ class UserFacadeImplTest {
     void updateUserPasswordTest() {
         User user = TestUserDataUtil.getUser1();
         UserDTO userDTO = TestUserDataUtil.getUserDTO1();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), "",
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
         ChangePasswordDTO changePasswordDTO = TestUserDataUtil.getChangePasswordDTO();
+        when(userServiceImpl.getUserByUsername(USERNAME_1)).thenReturn(user);
         when(userServiceImpl.changeUserPassword(eq(USER_ID_1), any(ChangePasswordDTO.class))).thenReturn(user);
-        UserDTO result = userFacade.updateUserPassword(USER_ID_1, changePasswordDTO);
+        UserDTO result = userFacade.updateUserPassword(authentication, changePasswordDTO);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(userDTO.getId())),
                 hasProperty("username", equalTo(userDTO.getUsername())),
@@ -154,6 +146,7 @@ class UserFacadeImplTest {
                 hasProperty("phoneNumber", equalTo(userDTO.getPhoneNumber())),
                 hasProperty("accountBalance", equalTo(userDTO.getAccountBalance()))
         ));
+        verify(userServiceImpl, times(1)).getUserByUsername(USERNAME_1);
         verify(userServiceImpl, times(1)).changeUserPassword(eq(USER_ID_1), any(ChangePasswordDTO.class));
     }
 
@@ -161,8 +154,11 @@ class UserFacadeImplTest {
     void increaseAccountBalanceTest() {
         User user = TestUserDataUtil.getUser1();
         UserDTO userDTO = TestUserDataUtil.getUserDTO1();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), "",
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
+        when(userServiceImpl.getUserByUsername(USERNAME_1)).thenReturn(user);
         when(userServiceImpl.increaseAccountBalance(USER_ID_1, AMOUNT)).thenReturn(user);
-        UserDTO result = userFacade.increaseAccountBalance(USER_ID_1, AMOUNT);
+        UserDTO result = userFacade.increaseAccountBalance(authentication, AMOUNT);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(userDTO.getId())),
                 hasProperty("username", equalTo(userDTO.getUsername())),
@@ -171,9 +167,24 @@ class UserFacadeImplTest {
                 hasProperty("phoneNumber", equalTo(userDTO.getPhoneNumber())),
                 hasProperty("accountBalance", equalTo(userDTO.getAccountBalance()))
         ));
+        verify(userServiceImpl, times(1)).getUserByUsername(USERNAME_1);
         verify(userServiceImpl, times(1)).increaseAccountBalance(USER_ID_1, AMOUNT);
-
-
     }
 
+    @Test
+    void updateRoleTest() {
+        User user = TestUserDataUtil.getUser2();
+        UserDTO userDTO = TestUserDataUtil.getUserDTO2();
+        when(userServiceImpl.updateRole(USER_ID_2, ROLE.name())).thenReturn(user);
+        UserDTO result = userFacade.updateRole(USER_ID_2, ROLE.name());
+        assertThat(result, allOf(
+                hasProperty("id", equalTo(userDTO.getId())),
+                hasProperty("username", equalTo(userDTO.getUsername())),
+                hasProperty("password", equalTo(userDTO.getPassword())),
+                hasProperty("email", equalTo(userDTO.getEmail())),
+                hasProperty("phoneNumber", equalTo(userDTO.getPhoneNumber())),
+                hasProperty("accountBalance", equalTo(userDTO.getAccountBalance()))
+        ));
+        verify(userServiceImpl, times(1)).updateRole(USER_ID_2, ROLE.name());
+    }
 }

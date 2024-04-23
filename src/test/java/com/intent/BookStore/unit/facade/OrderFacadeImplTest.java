@@ -18,7 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,9 +31,10 @@ import static com.intent.BookStore.unit.util.TestBookDataUtil.BOOK_ID_1;
 import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_1;
 import static com.intent.BookStore.unit.util.TestOrderDataUtil.ORDER_ID_2;
 import static com.intent.BookStore.unit.util.TestOrderItemDataUtil.ORDER_ITEM_ID_4;
-import static com.intent.BookStore.unit.util.TestUserDataUtil.USER_ID_2;
+import static com.intent.BookStore.unit.util.TestUserDataUtil.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -49,6 +55,8 @@ class OrderFacadeImplTest {
 
     @Test
     void createOrderItemTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_2, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_2.name())));
         OrderItemDTO initialOrderItemDTO = TestOrderItemDataUtil.getOrderItemDTO4()
                 .setId(0L)
                 .setTotalPrice(null)
@@ -69,11 +77,12 @@ class OrderFacadeImplTest {
         OrderDTO expectedOrderDTO = TestOrderDataUtil.getOrderDTO2().setOrderItemDTOs(orderItemDTOs);
 
         when(bookService.getBookById(BOOK_ID_1)).thenReturn(book);
+        when(userService.getUserByUsername(USERNAME_2)).thenReturn(user);
         when(userService.getUserById(USER_ID_2)).thenReturn(user);
         when(orderService.createOrder(user)).thenReturn(initialOrder);
         when(orderService.createOrderItem(any(OrderItem.class))).thenReturn(createdOrder);
 
-        OrderDTO result = orderFacade.createOrderItem(initialOrderItemDTO, USER_ID_2);
+        OrderDTO result = orderFacade.createOrderItem(authentication, initialOrderItemDTO);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(expectedOrderDTO.getId())),
                 hasProperty("userId", equalTo(expectedOrderDTO.getUserId())),
@@ -83,6 +92,7 @@ class OrderFacadeImplTest {
                 hasProperty("orderItemDTOs", equalTo(expectedOrderDTO.getOrderItemDTOs())
         )));
         verify(bookService, times(1)).getBookById(BOOK_ID_1);
+        verify(userService, times(1)).getUserByUsername(USERNAME_2);
         verify(userService, times(1)).getUserById(USER_ID_2);
         verify(orderService, times(1)).createOrder(user);
         verify(orderService, times(1)).createOrderItem(any(OrderItem.class));
@@ -90,6 +100,8 @@ class OrderFacadeImplTest {
 
     @Test
     void createOrderItemWithExistOrderTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_2, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_2.name())));
         OrderItemDTO initialOrderItemDTO = TestOrderItemDataUtil.getOrderItemDTO4()
                 .setId(0L)
                 .setTotalPrice(null);
@@ -100,6 +112,7 @@ class OrderFacadeImplTest {
         OrderItem orderItem3 = TestOrderItemDataUtil.getOrderItem3();
 
         Order order = TestOrderDataUtil.getOrder2();
+        User user = TestUserDataUtil.getUser2();
         Book book = orderItem.getBook();
         Set<OrderItem> orderItems = new HashSet<>();
         orderItems.add(orderItem);
@@ -111,10 +124,11 @@ class OrderFacadeImplTest {
         OrderDTO expectedOrderDTO = TestOrderDataUtil.getOrderDTO2().setOrderItemDTOs(orderItemDTOs);
 
         when(bookService.getBookById(BOOK_ID_1)).thenReturn(book);
+        when(userService.getUserByUsername(USERNAME_2)).thenReturn(user);
         when(orderService.getOrderById(ORDER_ID_2)).thenReturn(order);
         when(orderService.createOrderItem(any(OrderItem.class))).thenReturn(createdOrder);
 
-        OrderDTO result = orderFacade.createOrderItem(initialOrderItemDTO, 0);
+        OrderDTO result = orderFacade.createOrderItem(authentication, initialOrderItemDTO);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(expectedOrderDTO.getId())),
                 hasProperty("userId", equalTo(expectedOrderDTO.getUserId())),
@@ -124,6 +138,7 @@ class OrderFacadeImplTest {
                 hasProperty("orderItemDTOs", equalTo(expectedOrderDTO.getOrderItemDTOs())
                 )));
         verify(bookService, times(1)).getBookById(BOOK_ID_1);
+        verify(userService, times(1)).getUserByUsername(USERNAME_2);
         verify(orderService, times(1)).getOrderById(ORDER_ID_2);
         verify(orderService, times(1)).createOrderItem(any(OrderItem.class));
     }
@@ -148,24 +163,64 @@ class OrderFacadeImplTest {
 
     @Test
     void deleteOrderItemTest() {
-        orderFacade.deleteOrderItem(ORDER_ITEM_ID_4);
-        verify(orderService, times(1)).deleteOrderItem(ORDER_ITEM_ID_4);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_2, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_2.name())));
+        User user = TestUserDataUtil.getUser2();
+        OrderItem orderItem = TestOrderItemDataUtil.getOrderItem4();
+
+        when(userService.getUserByUsername(USERNAME_2)).thenReturn(user);
+        when(orderService.getOrderItemById(ORDER_ITEM_ID_4)).thenReturn(orderItem);
+
+        orderFacade.deleteOrderItem(authentication, ORDER_ITEM_ID_4);
+
+        verify(userService, times(1)).getUserByUsername(USERNAME_2);
+        verify(orderService, times(1)).getOrderItemById(ORDER_ITEM_ID_4);
+        verify(orderService, times(1)).deleteOrderItem(orderItem);
     }
 
     @Test
     void deleteOrderTest() {
-        orderFacade.deleteOrder(ORDER_ID_2);
-        verify(orderService, times(1)).deleteOrder(ORDER_ID_2);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_2, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_2.name())));
+        User user = TestUserDataUtil.getUser2();
+        Order order = TestOrderDataUtil.getOrder2();
+
+        when(userService.getUserByUsername(USERNAME_2)).thenReturn(user);
+        when(orderService.getOrderById(ORDER_ID_2)).thenReturn(order);
+
+
+        orderFacade.deleteOrder(authentication, ORDER_ID_2);
+
+        verify(userService, times(1)).getUserByUsername(USERNAME_2);
+        verify(orderService, times(1)).getOrderById(ORDER_ID_2);
+        verify(orderService, times(1)).deleteOrder(order);
+    }
+
+    @Test
+    void deleteOrderWithAccessDeniedExceptionTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
+        User user = TestUserDataUtil.getUser1();
+        Order order = TestOrderDataUtil.getOrder2();
+
+        when(userService.getUserByUsername(USERNAME_1)).thenReturn(user);
+        when(orderService.getOrderById(ORDER_ID_2)).thenReturn(order);
+        assertThrows(AccessDeniedException.class, () -> orderFacade.deleteOrder(authentication, ORDER_ID_2));
     }
 
     @Test
     void closeOrderTest() {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(USERNAME_1, "",
+                Collections.singleton(new SimpleGrantedAuthority(ROLE_1.name())));
+        User user = TestUserDataUtil.getUser1();
         Order order = TestOrderDataUtil.getOrder1();
         OrderDTO expectedOrderDTO = TestOrderDataUtil.getOrderDTO1();
 
-        when(orderService.closeOrder(ORDER_ID_1)).thenReturn(order);
+        when(userService.getUserByUsername(USERNAME_1)).thenReturn(user);
+        when(orderService.getOrderById(ORDER_ID_1)).thenReturn(order);
+        when(orderService.closeOrder(order)).thenReturn(order);
 
-        OrderDTO result = orderFacade.closeOrder(ORDER_ID_1);
+        OrderDTO result = orderFacade.closeOrder(authentication, ORDER_ID_1);
         assertThat(result, allOf(
                 hasProperty("id", equalTo(expectedOrderDTO.getId())),
                 hasProperty("userId", equalTo(expectedOrderDTO.getUserId())),
@@ -174,8 +229,9 @@ class OrderFacadeImplTest {
                 hasProperty("closed", equalTo(expectedOrderDTO.isClosed())),
                 hasProperty("completedAt", equalTo(expectedOrderDTO.getCompletedAt()))
         ));
-        verify(orderService, times(1)).closeOrder(ORDER_ID_1);
 
-
+        verify(userService, times(1)).getUserByUsername(USERNAME_1);
+        verify(orderService, times(1)).getOrderById(ORDER_ID_1);
+        verify(orderService, times(1)).closeOrder(order);
     }
 }
